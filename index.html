@@ -54,8 +54,7 @@
                         return response.json();
                     })
                     .then((data) => {
-            
-                        if ((data.actions.length-1)>log.length) {
+                        if (data.actions.length>log.length) {
                             log=data.actions;
                             initBoard();
                             playLog();
