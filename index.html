@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <title>chess board</title>
+        <style>
+
+            #board table {
+                width: 80vh;
+                height: 80vh;
+                margin: auto;
+                border-collapse: collapse;
+            }
+
+            #board .field-white {
+                background-color: #F2BC79;
+            }
+
+            #board .field-black {
+                background-color: #A66249;
+            }
+
+            main {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            #board td {
+                width: 10vh;
+                height: 10vh;
+            }
+
+            #board td img {
+                width: 100%;
+                height: 100%;
+            }
+
+            .pieces {
+                width: 120px;
+            }
+
+            .pieces img {
+                width: 80px;
+                height: 80px;
+            }
+
+        </style>
+        <script>
+            let board=[];
+            let log=[
+                ];
+
+            function fetchLog() {
+                fetch('https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec')
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+            
+                        if ((data.actions.length-1)>log.length) {
+                            log=data.actions;
+                            initBoard();
+                            playLog();
+                        }
+                        setTimeout(fetchLog, 2000)
+                    });
+            }
+
+            function appendLog(entry) {
+                const qs=`?action=${entry.action}&piece=${entry.piece}&to=${entry.to}&from=${entry.from}`;
+                fetch(`https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec${qs}`)
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+                        console.log(data);
+                    });
+                log.push(entry);
+            }
+            
+            function playLog() {
+                log.forEach((l)=>{
+                    if (l.action=='add') {
+                        let sq=document.getElementById(l.to);
+                        sq.innerHTML=`<img src="pieces.svg#${l.piece}">`;
+                    }
+                    if (l.action=='move') {
+                        let sq=document.getElementById(l.to);
+                        sq.innerHTML=`<img src="pieces.svg#${l.piece}">`;
+                        document.getElementById(l.from).innerHTML='';
+                    }
+                    if (l.action=='remove') {
+                        let sq=document.getElementById(l.from);
+                        sq.innerHTML=``;
+                    }
+                })
+            }
+
+            function initBoard() {
+                let htmlBoard='<table>';
+
+                const cols=['a','b','c','d','e','f','g','h'];
+                const rows=black?[1,2,3,4,5,6,7,8]:[8,7,6,5,4,3,2,1];
+                
+                rows.forEach((r) => {
+                    htmlBoard+=`<tr>`;
+                    cols.forEach((c,i) => {
+                        htmlBoard+=`<td id="${c}${r}" class="${(i+r+1)%2?'field-white':'field-black'}"></td>`;
+                    })
+                    htmlBoard+=`</tr>`;
+                })
+                htmlBoard+='</table>';
+                document.getElementById("board").innerHTML=htmlBoard;
+            }
+
+
+
+        window.onload = function() {
+            initBoard();
+            playLog();
+            fetchLog();
+
+            document.addEventListener('dragstart', function(event) {
+                $dragged = event.target;
+                event.dataTransfer.dropEffect='copy';
+                draggedPiece=$dragged.getAttribute('src').split('#')[1];
+                draggedFrom="";
+
+                if ($dragged.parentNode.tagName=='TD') draggedFrom=$dragged.parentNode.id;
+                console.log(`picked up a ${draggedPiece} from ${draggedFrom}`);
+                return (false);
+
+                }, false);
+
+            document.addEventListener("dragover", function(event) {
+                  event.preventDefault();
+                }, false);
+
+
+            document.addEventListener('drop', function (event) {
+                event.preventDefault();
+                const t=event.target;
+                const tp=event.target.parentNode;
+                if (t.tagName == 'TD' || tp.tagName == 'TD') {
+                    square=(t.tagName == 'TD')?t.id:tp.id;
+                    console.log(`set a ${draggedPiece} on ${square} from ${draggedFrom}`)
+                    if (draggedFrom) {
+                        appendLog({action:'move', piece: draggedPiece, from:draggedFrom, to:square});
+                    } else {
+                        appendLog({action:'add', piece: draggedPiece, to:square, from:"box of pieces"});
+                    }
+                } else {
+                    console.log(`removed a ${draggedPiece} from ${draggedFrom}`)
+                    appendLog({action:'remove', piece: draggedPiece, from:draggedFrom, to:"graveyard"});
+                }
+                initBoard();
+                playLog();
+            }, false)
+        }
+
+        const black=(window.location.hash=="#black")?true:false;
+
+        </script>
+    </head>
+    <body>
+        <main>
+            <div class="white pieces">
+                <img src="pieces.svg#white-king">
+                <img src="pieces.svg#white-queen">
+                <img src="pieces.svg#white-bishop">
+                <img src="pieces.svg#white-knight">
+                <img src="pieces.svg#white-rook">
+                <img src="pieces.svg#white-pawn">
+            </div>
+            <div id="board"></div>
+            <div class="black pieces">
+                <img src="pieces.svg#black-king">
+                <img src="pieces.svg#black-queen">
+                <img src="pieces.svg#black-rook">
+                <img src="pieces.svg#black-knight">
+                <img src="pieces.svg#black-bishop">
+                <img src="pieces.svg#black-pawn">
+            </div>         
+        </main>
+    </body>
+</html>
