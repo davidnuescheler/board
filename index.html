@@ -18,6 +18,10 @@
                 background-color: #A66249;
             }
 
+            #board .field-last-move-to {                
+                border: 4px solid yellow;                
+            }
+
             main {
                 display: flex;
                 justify-content: space-between;
@@ -75,8 +79,12 @@
                 log.push(entry);
             }
             
-            function playLog() {
-                log.forEach((l)=>{
+            function playLog() {                
+                let toSqId;                
+                log.forEach((l)=>{                    
+                    if(l.to){
+                        toSqId = l.to;
+                    }
                     if (l.action=='add') {
                         let sq=document.getElementById(l.to);
                         sq.innerHTML=`<img src="pieces.svg#${l.piece}">`;
@@ -88,9 +96,13 @@
                     }
                     if (l.action=='remove') {
                         let sq=document.getElementById(l.from);
-                        sq.innerHTML=``;
-                    }
-                })
+                        sq.innerHTML=``;                        
+                    }                    
+                 })                 
+                let lastMoveSq=document.getElementById(toSqId);
+                if(lastMoveSq) {
+                    lastMoveSq.className = lastMoveSq.className + ' field-last-move-to';
+                }
             }
 
             function initBoard() {
