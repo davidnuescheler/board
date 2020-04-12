@@ -18,6 +18,14 @@
                 background-color: #A66249;
             }
 
+            #board .field-last-move-to {                
+                background-color: yellow;
+            }
+
+            #board .field-last-move-from {                
+                background-color: gray;
+            }
+
             main {
                 display: flex;
                 justify-content: space-between;
@@ -47,6 +55,7 @@
             let board=[];
             let log=[
                 ];
+            const BoP = "box of pieces";
 
             function fetchLog() {
                 fetch('https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec')
@@ -59,7 +68,7 @@
                             initBoard();
                             playLog();
                         }
-                        setTimeout(fetchLog, 2000)
+                        setTimeout(fetchLog, 1000)
                     });
             }
 
@@ -75,8 +84,15 @@
                 log.push(entry);
             }
             
-            function playLog() {
-                log.forEach((l)=>{
+            function playLog() {                
+                let toSqId, fromSqId;
+                log.forEach((l)=>{                                                            
+                    if(l.from && l.from != BoP) {
+                        if(l.to) {
+                            toSqId = l.to;
+                        }
+                        fromSqId = l.from;
+                    }
                     if (l.action=='add') {
                         let sq=document.getElementById(l.to);
                         sq.innerHTML=`<img src="pieces.svg#${l.piece}">`;
@@ -88,9 +104,17 @@
                     }
                     if (l.action=='remove') {
                         let sq=document.getElementById(l.from);
-                        sq.innerHTML=``;
+                        sq.innerHTML=``;                        
+                    }                    
+                 })                                 
+                let lastMoveFromSq=document.getElementById(fromSqId);
+                let lastMoveToSq=document.getElementById(toSqId);
+                if(lastMoveFromSq) {
+                    if(lastMoveToSq) {
+                        lastMoveToSq.className = lastMoveToSq.className + ' field-last-move-to';
                     }
-                })
+                    lastMoveFromSq.className = lastMoveFromSq.className + ' field-last-move-from';
+                }
             }
 
             function initBoard() {
@@ -144,7 +168,7 @@
                     if (draggedFrom) {
                         appendLog({action:'move', piece: draggedPiece, from:draggedFrom, to:square});
                     } else {
-                        appendLog({action:'add', piece: draggedPiece, to:square, from:"box of pieces"});
+                        appendLog({action:'add', piece: draggedPiece, to:square, from:BoP});
                     }
                 } else {
                     console.log(`removed a ${draggedPiece} from ${draggedFrom}`)
