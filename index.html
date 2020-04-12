@@ -19,7 +19,11 @@
             }
 
             #board .field-last-move-to {                
-                border: 4px solid yellow;                
+                background-color: yellow;
+            }
+
+            #board .field-last-move-from {                
+                background-color: gray;
             }
 
             main {
@@ -51,6 +55,7 @@
             let board=[];
             let log=[
                 ];
+            const BoP = "box of pieces";
 
             function fetchLog() {
                 fetch('https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec')
@@ -80,10 +85,13 @@
             }
             
             function playLog() {                
-                let toSqId;                
-                log.forEach((l)=>{                    
-                    if(l.to){
-                        toSqId = l.to;
+                let toSqId, fromSqId;
+                log.forEach((l)=>{                                                            
+                    if(l.from && l.from != BoP){
+                        if(l.to){
+                            toSqId = l.to;
+                        }
+                        fromSqId = l.from;
                     }
                     if (l.action=='add') {
                         let sq=document.getElementById(l.to);
@@ -99,9 +107,13 @@
                         sq.innerHTML=``;                        
                     }                    
                  })                 
-                let lastMoveSq=document.getElementById(toSqId);
-                if(lastMoveSq) {
-                    lastMoveSq.className = lastMoveSq.className + ' field-last-move-to';
+                let lastMoveToSq=document.getElementById(toSqId);
+                if(lastMoveToSq) {
+                    lastMoveToSq.className = lastMoveToSq.className + ' field-last-move-to';
+                }
+                let lastMoveFromSq=document.getElementById(fromSqId);
+                if(lastMoveFromSq) {
+                    lastMoveFromSq.className = lastMoveFromSq.className + ' field-last-move-from';
                 }
             }
 
