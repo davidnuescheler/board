@@ -68,7 +68,7 @@
                             initBoard();
                             playLog();
                         }
-                        setTimeout(fetchLog, 2000)
+                        setTimeout(fetchLog, 1000)
                     });
             }
 
@@ -87,8 +87,8 @@
             function playLog() {                
                 let toSqId, fromSqId;
                 log.forEach((l)=>{                                                            
-                    if(l.from && l.from != BoP){
-                        if(l.to){
+                    if(l.from && l.from != BoP) {
+                        if(l.to) {
                             toSqId = l.to;
                         }
                         fromSqId = l.from;
@@ -106,13 +106,13 @@
                         let sq=document.getElementById(l.from);
                         sq.innerHTML=``;                        
                     }                    
-                 })                 
-                let lastMoveToSq=document.getElementById(toSqId);
-                if(lastMoveToSq) {
-                    lastMoveToSq.className = lastMoveToSq.className + ' field-last-move-to';
-                }
+                 })                                 
                 let lastMoveFromSq=document.getElementById(fromSqId);
+                let lastMoveToSq=document.getElementById(toSqId);
                 if(lastMoveFromSq) {
+                    if(lastMoveToSq) {
+                        lastMoveToSq.className = lastMoveToSq.className + ' field-last-move-to';
+                    }
                     lastMoveFromSq.className = lastMoveFromSq.className + ' field-last-move-from';
                 }
             }
@@ -168,7 +168,7 @@
                     if (draggedFrom) {
                         appendLog({action:'move', piece: draggedPiece, from:draggedFrom, to:square});
                     } else {
-                        appendLog({action:'add', piece: draggedPiece, to:square, from:"box of pieces"});
+                        appendLog({action:'add', piece: draggedPiece, to:square, from:BoP});
                     }
                 } else {
                     console.log(`removed a ${draggedPiece} from ${draggedFrom}`)
