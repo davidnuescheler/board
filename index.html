@@ -166,7 +166,9 @@
                     square=(t.tagName == 'TD')?t.id:tp.id;
                     console.log(`set a ${draggedPiece} on ${square} from ${draggedFrom}`)
                     if (draggedFrom) {
-                        appendLog({action:'move', piece: draggedPiece, from:draggedFrom, to:square});
+                        if (draggedFrom != square) {
+                            appendLog({action:'move', piece: draggedPiece, from:draggedFrom, to:square});
+                        }
                     } else {
                         appendLog({action:'add', piece: draggedPiece, to:square, from:BoP});
                     }
