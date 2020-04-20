@@ -99,8 +99,20 @@
                 ];
             const BoP = "box of pieces";
 
+            function getQueryParams() {
+                let queryParams = {};
+                let queryStrings = window.location.search.substring(1);
+                let params = queryStrings.split('&');
+
+                for (var i = 0; i < params.length; i++) {
+                    var pair = params[i].split('=');
+                    queryParams[pair[0]] = decodeURIComponent(pair[1]);
+                }
+                return queryParams;
+            };
+
             function fetchLog() {
-                fetch('https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec')
+                fetch(`https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec?board=${queryParams.board}`)
                     .then((response) => {
                         return response.json();
                     })
@@ -115,7 +127,7 @@
             }
 
             function appendLog(entry) {
-                const qs=`?action=${entry.action}&piece=${entry.piece}&to=${entry.to}&from=${entry.from}`;
+                const qs=`?action=${entry.action}&piece=${entry.piece}&to=${entry.to}&from=${entry.from}&board=${queryParams.board}`;
                 fetch(`https://script.google.com/macros/s/AKfycbwibc9fwhOmK3PYNdUIuVeSiVnxirTtkJfHv2v0Sw/exec${qs}`)
                     .then((response) => {
                         return response.json();
@@ -224,6 +236,7 @@
         }
 
         const black=(window.location.hash=="#black")?true:false;
+        const queryParams=getQueryParams();
 
         </script>
     </head>
